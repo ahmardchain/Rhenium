@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
-import { IPayable } from "@reactive/src/interfaces/IPayable.sol";
-import { AbstractCallback } from "@reactive/src/base/AbstractCallback.sol";
+import {IPayable} from "@reactive/src/interfaces/IPayable.sol";
+import {AbstractCallback} from "@reactive/src/base/AbstractCallback.sol";
 
 /// @title SpikeCallback
 /// @notice Step 1 spike only. Destination contract: does a configurable amount of work, then emits Delivered.
@@ -12,7 +12,10 @@ contract SpikeCallback is AbstractCallback {
     mapping(uint256 => uint256) public slots;
     mapping(uint256 => bool) public delivered;
 
-    constructor(IPayable callbackProxy_, address callbackSender_) payable AbstractCallback(callbackProxy_, callbackSender_) { }
+    constructor(IPayable callbackProxy_, address callbackSender_)
+        payable
+        AbstractCallback(callbackProxy_, callbackSender_)
+    {}
 
     /// @param rvm_ overwritten by the proxy with the requesting reactive contract
     function onPing(address rvm_, uint256 id_, uint256 attempt_, uint256 work_)

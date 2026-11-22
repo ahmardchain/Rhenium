@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
-import { ISystemContract } from "@reactive/src/interfaces/ISystemContract.sol";
-import { IReactive } from "@reactive/src/interfaces/IReactive.sol";
-import { AbstractReactive } from "@reactive/src/base/AbstractReactive.sol";
+import {ISystemContract} from "@reactive/src/interfaces/ISystemContract.sol";
+import {IReactive} from "@reactive/src/interfaces/IReactive.sol";
+import {AbstractReactive} from "@reactive/src/base/AbstractReactive.sol";
 
 /// @title SpikeReactive
 /// @notice Step 1 spike only (S1-S4). Lives on Reactive Lasna.
@@ -70,7 +70,9 @@ contract SpikeReactive is AbstractReactive {
         require(callback == address(0), "set");
         callback = cb_;
         SYSTEM.subscribe(destChainId, cb_, DELIVERED_TOPIC, REACTIVE_IGNORE, REACTIVE_IGNORE, REACTIVE_IGNORE);
-        SYSTEM.subscribe(destChainId, destProxy, CALLBACK_FAILURE_TOPIC, uint256(uint160(cb_)), REACTIVE_IGNORE, REACTIVE_IGNORE);
+        SYSTEM.subscribe(
+            destChainId, destProxy, CALLBACK_FAILURE_TOPIC, uint256(uint160(cb_)), REACTIVE_IGNORE, REACTIVE_IGNORE
+        );
     }
 
     function setCron(bool on_) external onlyOwner {
@@ -99,7 +101,9 @@ contract SpikeReactive is AbstractReactive {
                 pending--;
                 emit Confirmed(id, p.attempt, log_.txHash);
             }
-        } else if (log_.topic0 == CALLBACK_FAILURE_TOPIC && log_.contractAddress == destProxy && log_.chainId == destChainId) {
+        } else if (
+            log_.topic0 == CALLBACK_FAILURE_TOPIC && log_.contractAddress == destProxy && log_.chainId == destChainId
+        ) {
             bytes memory payload = abi.decode(log_.data, (bytes));
             if (payload.length < 4 + 32 * 4) return;
             uint256 id;
@@ -162,9 +166,13 @@ contract SpikeReactive is AbstractReactive {
         if (on_ == cronOn) return;
         cronOn = on_;
         if (on_) {
-            SYSTEM.subscribe(block.chainid, LEGACY_SYSTEM, CRON10_TOPIC, REACTIVE_IGNORE, REACTIVE_IGNORE, REACTIVE_IGNORE);
+            SYSTEM.subscribe(
+                block.chainid, LEGACY_SYSTEM, CRON10_TOPIC, REACTIVE_IGNORE, REACTIVE_IGNORE, REACTIVE_IGNORE
+            );
         } else {
-            SYSTEM.unsubscribe(block.chainid, LEGACY_SYSTEM, CRON10_TOPIC, REACTIVE_IGNORE, REACTIVE_IGNORE, REACTIVE_IGNORE);
+            SYSTEM.unsubscribe(
+                block.chainid, LEGACY_SYSTEM, CRON10_TOPIC, REACTIVE_IGNORE, REACTIVE_IGNORE, REACTIVE_IGNORE
+            );
         }
         emit Cron(on_);
     }
