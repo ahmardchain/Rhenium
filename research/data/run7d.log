@@ -1,2 +1,221 @@
 lasna blocks 8359655 8925558
 requests 11184 {84532: 6805, 11155111: 897, 1301: 3447, 5318007: 35}
+84532 6805 6792 233
+1301 3447 3429 56
+{
+ "generated_utc": "2026-11-22T00:10:23Z",
+ "window_utc": [
+  "2026-11-14T22:10:23Z",
+  "2026-11-21T22:10:23Z"
+ ],
+ "days": 7.0,
+ "lasna_blocks": [
+  8359655,
+  8925558
+ ],
+ "requests_total": 11184,
+ "requests_by_chain": {
+  "84532": 6805,
+  "11155111": 897,
+  "1301": 3447,
+  "5318007": 35
+ },
+ "getCallbacks_sample": {
+  "sampled": 40,
+  "non_empty": 0,
+  "records": [
+   {
+    "tx": "0x832b9ca94aa4e1f7eda12d515aa2a852c1ed5aefe44a393f2324c0ba59451b23",
+    "result": "[]"
+   },
+   {
+    "tx": "0xfbb03c50f05c95ce4b31dad651bb50b3dc1a117d39ba48eeff4328e70a97f5d8",
+    "result": "[]"
+   },
+   {
+    "tx": "0xd6ad428dd4c23d3c9226c82ccb20eb4482426b7ecc7f79210284767b6de914dc",
+    "result": "[]"
+   },
+   {
+    "tx": "0x00e362c77a7e2668e4526ce5ac4543f85a396969964138a7720675801726b18e",
+    "result": "[]"
+   },
+   {
+    "tx": "0x89b7fdb972acbb2bb98a2a1ab8551354615a523f3813538d5e9a0796988b189a",
+    "result": "[]"
+   },
+   {
+    "tx": "0xf9a457335d37c80e76db3f828cd03084f9d4eb8632cc2de0f91f52e17dfcc1b9",
+    "result": "[]"
+   },
+   {
+    "tx": "0x7836e4066cf1662b9c87f328626e90b20467a99a4890e6c5f3c88bd1b8d4fde6",
+    "result": "[]"
+   },
+   {
+    "tx": "0x8da1c002ef7ce04c8b1e04aa75af39a9a70ca5b786eae09f8177ed959d6e2fc7",
+    "result": "[]"
+   },
+   {
+    "tx": "0xb503b4c32a67ac132276b5841124c97dcbc68467012fdcc4e6f88dc0688192b4",
+    "result": "[]"
+   },
+   {
+    "tx": "0x0026b4a31a9c239d0123a67a727866bb5ffa10539e3c0b0d9381c73f80201210",
+    "result": "[]"
+   },
+   {
+    "tx": "0xba4b63ea499bb63b2d9104845c83963431b52a4b31361ebb068eebe51c594a6f",
+    "result": "[]"
+   },
+   {
+    "tx": "0x8e264dc9f0458a330df880583bd721d9e023b85c4fc2bf25ba198049171fe0e3",
+    "result": "[]"
+   },
+   {
+    "tx": "0xfca71c83de365d08e0147610da204da6fdbf94ec459b66f96adac1ec83ce6700",
+    "result": "[]"
+   },
+   {
+    "tx": "0xa61750f6d2ff51fd1da0bb1c4e669fc939e70dd9414df41d3b645145ae1cdff4",
+    "result": "[]"
+   },
+   {
+    "tx": "0x060f9a45d87990153ee9a9de0ef2de47e51f8ffb9bde68326516fae6e25316e9",
+    "result": "[]"
+   },
+   {
+    "tx": "0xbcfd8ab5e1f3041e2aad60cbd06518b5a4495e3e4afad40cd12f66b018f251b9",
+    "result": "[]"
+   },
+   {
+    "tx": "0x76f533923339988f355be71a6f7b4a54db16b40b04cd7c836be7c7d2d1ac291c",
+    "result": "[]"
+   },
+   {
+    "tx": "0x613c3c45cf2f6d46e30497650446341cc228cbc4d977999e45f42ebfcbbc25cf",
+    "result": "[]"
+   },
+   {
+    "tx": "0x4758e4ce998dddbe035231e1fca53aa8d06fb0ece6b9a7984eaf206cbd5cf6c6",
+    "result": "[]"
+   },
+   {
+    "tx": "0xd116ea59549d1d33f511d8ad285273a88fde88d37d3f4f6bf156ac7d2681de6b",
+    "result": "[]"
+   },
+   {
+    "tx": "0x46c3da069f8a88a27c0671bd32e50d97d73d584a99f3b0fc1f49a11ad0033a07",
+    "result": "[]"
+   },
+   {
+    "tx": "0x370f3b2b63faa8379a3e44ca496ec73e559101e1a9d1172a4d357680598d45c1",
+    "result": "[]"
+   },
+   {
+    "tx": "0x9fe7518838e4feef57e768615057779cf938c70e18827e2c6a94064c926f5e26",
+    "result": "[]"
+   },
+   {
+    "tx": "0xeeb9ef0bde311728a04979f139a859d988811d83df2c564d5ac9ebf4af023f37",
+    "result": "[]"
+   },
+   {
+    "tx": "0x245823b94bce905ae3c940407a2cbf26b8b76bb9890e9459328f9fa9bfcfa55c",
+    "result": "[]"
+   },
+   {
+    "tx": "0x9357f813274bc572e74cd749ad8ceb04379fbb792adf91b6d5b01f9a23755d98",
+    "result": "[]"
+   },
+   {
+    "tx": "0xefbe9b28bd37ebe1034fd60184226d74ed63a905c0089049af84c31b0fb1684b",
+    "result": "[]"
+   },
+   {
+    "tx": "0xd29c1a6cdc81ca09be1e46a60e93d4b884277c14a01f6053bb258f7d2b765dce",
+    "result": "[]"
+   },
+   {
+    "tx": "0xf92b6623c4d56522c4d5e9272bfebd0818c93ac8912e15799907832172a3a6b4",
+    "result": "[]"
+   },
+   {
+    "tx": "0x57107e649b7a682302f0702df0dcc45386f0591ac48a7a96ea5f3640009df069",
+    "result": "[]"
+   },
+   {
+    "tx": "0x3425c262ec203f8fab1e9ece86dadc7842bd88b0efc9702ce2b455fed6fda2ca",
+    "result": "[]"
+   },
+   {
+    "tx": "0xa88bbba7de1245438cf67d975fd71737cc1ef08921fc1f38749253ac882308c9",
+    "result": "[]"
+   },
+   {
+    "tx": "0xcdfdc701924337e34dcf9f8d29a53a3e7c2c37adafab88a9de628e93ac351a35",
+    "result": "[]"
+   },
+   {
+    "tx": "0x5b01c6fd689382e1c6b97e0459811383cdea8402c78981830e8ace8ba81dc918",
+    "result": "[]"
+   },
+   {
+    "tx": "0x8ff5c556398203164d24293cff7f42a2b201099400091ec5dc0f5b9cb6e3d0b1",
+    "result": "[]"
+   },
+   {
+    "tx": "0xd6542e9fe6e1afcbbd2de35d626fb769504f6b6114252c11a6539f65c24e0574",
+    "result": "[]"
+   },
+   {
+    "tx": "0x3db5ca158329de84ec511685269bd8a212e51399f6c11d535d83adab68370d5f",
+    "result": "[]"
+   },
+   {
+    "tx": "0x9b908f9662440b32584fac8a4708e1eb6300718abec5288147b64860559e9cb2",
+    "result": "[]"
+   },
+   {
+    "tx": "0xc2ce08514f82863149f4e482c598790b0d6d66b9f193b2ae48a19b782a681a37",
+    "result": "[]"
+   },
+   {
+    "tx": "0x3cd1b604b4ba6fa6b6fd9aedcb45f69ac3ed5753a4d1c9e4733f61f5cf589a3a",
+    "result": "[]"
+   }
+  ]
+ },
+ "dest": {
+  "84532": {
+   "net": "base_sepolia",
+   "blocks": [
+    58861771,
+    61885770
+   ],
+   "requests": 6805,
+   "delivery_attempts": 6792,
+   "callback_failures": 233,
+   "never_attempted": 13,
+   "failure_recipients": {
+    "0x995b75ef4b84e346dc2fdc73f60554469f24eb9e": 126,
+    "0xe93061b12b68199b44f572de30dc5cca992ad713": 20,
+    "0x50fc02124386efdc9a1bd4e39d9ca8bb27a9cce4": 10,
+    "0x61c85958c265ac5df9feb9cc3e07a536e426ed87": 7,
+    "0x649da92ea138f5dc6a787c4e8d0abfce501d774d": 6,
+    "0xc81b03cb1f20b59fbd4dd850b950bda8e2ba47c0": 6,
+    "0x61853f5138a90c2ceeccb7840e656b313e47b16f": 6,
+    "0x1d0e05b9b704ea503b121dd34fbd82efefc2a796": 5,
+    "0x60aa54822b790fdbe4985bb78c2ce5d088d83627": 5,
+    "0x60368daaffbaf88c520a6eee18e64bda8cb99097": 4,
+    "0x2eccb0de7875535ed8758034acd46c32a37b97d5": 4,
+    "0x76763c89048274f795f4e1090e3eb20cb68d32f2": 2,
+    "0x7b0381942106f8570d82dcd0213dd3fe61df9e06": 2,
+    "0x86e63fc9108380e80bcfcf1b154ad63a440ae19f": 2,
+    "0xcc58f500bff3f3e3b618d42901d4f4d5ad112667": 2,
+    "0x54f731519464f60eaf3f609ffa9a8b1f5db06005": 2,
+    "0x27e5251fb16e4e8446e4e6fa20f830ea145d18fc": 2,
+    "0xad2a3a224667f0b0548696b0d28277a8c90dd7c3": 2,
+    "0x0870993bcd873b376240563cd
+
+HEADLINE (Base+Unichain Sepolia): over 10252 callbacks requested on Lasna in 7 days, 31 never produced a destination tx, 289 emitted CallbackFailure; 320 (3.1%) did not land. -> data/measure_20261122T0010Z.json
