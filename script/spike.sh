@@ -13,7 +13,7 @@ BASE_ID=84532
 
 create() { # rpc contract args...
   local rpc=$1 c=$2; shift 2
-  forge create --broadcast --rpc-url "$rpc" --private-key "$PRIVATE_KEY" "$c" "$@" --json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["deployedTo"], d["transactionHash"])'
+  forge create --broadcast --rpc-url "$rpc" --private-key "$PRIVATE_KEY" "$c" --json "$@" 2>/dev/null | python3 -c 'import json,sys,re; t=sys.stdin.read(); d=json.loads(t[t.index("{\n  \"deployer"):] if "{\n  \"deployer" in t else t[t.rindex("{"):]); print(d["deployedTo"], d["transactionHash"])'
 }
 
 case "${1:-}" in
