@@ -4,6 +4,7 @@
 #   script/demo.sh pay naive|rhenium GAS  Alice pays 25 mUSD to Bob on Unichain, starting with callback gas GAS
 #   script/demo.sh balances               Bob's mUSD on Unichain, payer escrow on Base
 set -euo pipefail
+export PATH="$HOME/.foundry/bin:$PATH"
 cd "$(dirname "$0")/.."
 set -a; source .env; set +a
 OUT=deployments/demo.env

@@ -2,6 +2,7 @@
 # Step 1 spike deployment (testnet only). Usage: script/spike.sh deploy | ping <gasLimit> <work> | status
 # Reads PRIVATE_KEY / RPCs from .env. Writes addresses to deployments/spike.env.
 set -euo pipefail
+export PATH="$HOME/.foundry/bin:$PATH"
 cd "$(dirname "$0")/.."
 set -a; source .env; set +a
 mkdir -p deployments
