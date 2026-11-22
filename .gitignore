@@ -11,3 +11,5 @@ keys/
 __pycache__/
 *.pyc
 node_modules/
+# in-progress scan logs (final results are the committed .json files)
+research/data/reverted_*.log
