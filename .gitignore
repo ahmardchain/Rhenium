@@ -1,0 +1,13 @@
+# Foundry
+out/
+cache/
+broadcast/*/31337/
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+keys/
+# Python
+__pycache__/
+*.pyc
+node_modules/
