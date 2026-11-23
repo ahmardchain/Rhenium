@@ -11,7 +11,7 @@ retries and no delivery acknowledgement. **Rhenium is the delivery-confirmation 
 every callback is tracked until the destination confirms it, failed or silently lost callbacks are retried with more gas,
 and nothing just disappears.
 
-* **Dashboard:** [`dashboard/index.html`](dashboard/index.html), a live, read-only receipts view (hosted link: _added at submission_)
+* **Live dashboard:** **https://rhenium-liard.vercel.app**, a read-only receipts view reading straight from Lasna (source: [`dashboard/index.html`](dashboard/index.html))
 * **Library in 10 lines:** [below](#use-the-library-in-10-lines), compiled as [`src/examples/Minimal.sol`](src/examples/Minimal.sol)
 * **Video (under 3 min):** _added at submission_
 * **Track:** Every Second Counts (Reactive Omni Buildathon). Rhenium is the reliability layer under time-sensitive loops:
@@ -55,7 +55,7 @@ Bob should receive 25 mUSD on Unichain Sepolia.
 | What happens next | **Nothing. Ever.** Bob is unpaid, Alice's 25 mUSD sits in escrow, no contract anywhere knows. | Timeout detected, retried at 200k → `CallbackFailure`, retried at 300k → **Bob paid**, receipt Confirmed |
 | Bob's balance from this payment | 0 | 25 mUSD |
 
-Watch it live on the dashboard: every receipt, every attempt, every transaction link.
+Watch it live on the [dashboard](https://rhenium-liard.vercel.app): every receipt, every attempt, every transaction link.
 
 ### The full Rhenium loop (payment #1)
 
