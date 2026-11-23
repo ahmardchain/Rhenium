@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rhenium receipts</title>
+<meta name="description" content="Live, read-only view of Rhenium delivery receipts on Reactive Lasna: every cross-chain callback tracked until it is confirmed on the destination.">
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --ink: #1b1d21; --muted: #5d6470; --line: #e3e4e0;
+    --ok: #13795b; --ok-bg: #e3f4ec; --warn: #9a5b00; --warn-bg: #fdf0db;
+    --bad: #b42318; --bad-bg: #fde8e6; --info: #2f5bd3; --info-bg: #e6ecfc; --idle: #6b7280; --idle-bg: #eef0f2;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111316; --panel: #191c20; --ink: #e8e9eb; --muted: #9aa1ab; --line: #2a2e34;
+      --ok: #4cc79a; --ok-bg: #12301f; --warn: #f0b45b; --warn-bg: #33270f;
+      --bad: #ff8a7d; --bad-bg: #3a1714; --info: #8aa8ff; --info-bg: #1a2443; --idle: #9aa1ab; --idle-bg: #23272d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111316; --panel: #191c20; --ink: #e8e9eb; --muted: #9aa1ab; --line: #2a2e34;
+    --ok: #4cc79a; --ok-bg: #12301f; --warn: #f0b45b; --warn-bg: #33270f;
+    --bad: #ff8a7d; --bad-bg: #3a1714; --info: #8aa8ff; --info-bg: #1a2443; --idle: #9aa1ab; --idle-bg: #23272d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1080px; margin: 0 auto; padding: 28px 16px 64px; }
+  header h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header p { margin: 0; color: var(--muted); max-width: 70ch; }
+  a { color: var(--info); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono { font-family: var(--mono); font-size: 13px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 16px 0 20px; color: var(--muted); font-size: 13px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; background: var(--idle-bg); color: var(--idle); font-size: 13px; }
+  .chip.on { background: var(--ok-bg); color: var(--ok); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .tile .n { font-size: 28px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .tile .l { color: var(--muted); font-size: 13px; }
+  .tile.ok .n { color: var(--ok); } .tile.warn .n { color: var(--warn); } .tile.info .n { color: var(--info); } .tile.bad .n { color: var(--bad); }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 20px; }
+  section > h2 { font-size: 15px; margin: 0; padding: 14px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  section > h2 small { font-weight: 400; color: var(--muted); }
+  .empty { padding: 16px; color: var(--muted); }
+  .rcpt { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .rcpt:last-child { border-bottom: 0; }
+  .rhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+  .rid { font-weight: 650; }
+  .pill { font-size: 12px; font-weight: 600; padding: 1px 9px; border-radius: 999px; }
+  .Confirmed { background: var(--ok-bg); color: var(--ok); }
+  .Recovered { background: var(--info-bg); color: var(--info); }
+  .Pending { background: var(--warn-bg); color: var(--warn); }
+  .Failed { background: var(--bad-bg); color: var(--bad); }
+  .Unknown { background: var(--idle-bg); color: var(--idle); }
+  .meta { color: var(--muted); font-size: 13px; }
+  ol.att { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+  ol.att li { display: grid; grid-template-columns: 82px 110px 1fr; gap: 8px; align-items: baseline; font-size: 13px; }
+  ol.att .k { color: var(--muted); }
+  .out-ok { color: var(--ok); } .out-fail { color: var(--bad); } .out-wait { color: var(--warn); } .out-lost { color: var(--bad); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; }
+  .scroll { overflow-x: auto; }
+  button { font: inherit; font-size: 13px; padding: 4px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  .err { color: var(--bad); padding: 12px 16px; }
+  footer { color: var(--muted); font-size: 13px; margin-top: 28px; }
+  @media (max-width: 720px) {
+    .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    ol.att li { grid-template-columns: 70px 1fr; }
+    ol.att li .o { grid-column: 1 / -1; padding-left: 70px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Rhenium receipts</h1>
+    <p>Every cross-chain callback this reactive contract sends is tracked until the destination acknowledges it. Failed
+      or lost callbacks are retried with more gas. Read live from Reactive Lasna; nothing here is cached or mocked.</p>
+  </header>
+
+  <div class="bar">
+    <span>Contract <a id="contract" class="mono" target="_blank" rel="noopener"></a></span>
+    <span id="cron" class="chip"><span class="dot"></span><span>cron</span></span>
+    <span id="pendingChip" class="chip"><span class="dot"></span><span>pending</span></span>
+    <span id="frontier"></span>
+    <span id="updated"></span>
+    <button id="theme" type="button" aria-label="Toggle colour theme">Theme</button>
+  </div>
+
+  <div class="tiles">
+    <div class="tile ok"><div class="n" id="t-first">–</div><div class="l">Confirmed first try</div></div>
+    <div class="tile info"><div class="n" id="t-recov">–</div><div class="l">Recovered after retry</div></div>
+    <div class="tile warn"><div class="n" id="t-pend">–</div><div class="l">Pending</div></div>
+    <div class="tile bad"><div class="n" id="t-fail">–</div><div class="l">Gave up (alarm sent)</div></div>
+  </div>
+
+  <section>
+    <h2>Rhenium payments <small>RheniumPaymentReactive: tracked with <code>_sendTracked</code></small></h2>
+    <div id="receipts"><div class="empty">Loading receipts from Lasna…</div></div>
+  </section>
+
+  <section id="naiveSection">
+    <h2>Naive payments, for comparison <small>NaivePaymentReactive: plain <code>requestCallbackV_1_0</code></small></h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Payment</th><th>Gas limit</th><th>Reactive tx</th><th>What the contract knows</th></tr></thead>
+      <tbody id="naive"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Live subscriptions <small>from <code>rnk_getFilters</code></small> <button id="loadSubs" type="button">Load (about 3 MB)</button></h2>
+    <div id="subs" class="empty">Shows which origin events, acknowledgements, failure events and cron ticks this contract is subscribed to right now.</div>
+  </section>
+
+  <footer>
+    Read-only: no wallet, no keys. Override the contract with <code>?reactive=0x…&amp;from=&lt;block&gt;</code>.
+    Source: <code>dashboard/index.html</code> in the Rhenium repository.
+  </footer>
+</main>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------- configuration (defaults: the live demo)
+const Q = new URLSearchParams(location.search);
+const CFG = {
+  lasnaRpc: "https://lasna-rpc.rnk.dev/",
+  reactive: (Q.get("reactive") || "0x6Df4d0d5983d79e4f5489f6f1406CEE8Cfa7EeFb").toLowerCase(),
+  naive: (Q.get("naive") || (Q.get("reactive") ? "" : "0xfa23E6063cA72f60ee55234eC8A068Ea0f1803E5")).toLowerCase(),
+  fromBlock: Number(Q.get("from") || 8954779),
+  span: 20000,          // Lasna eth_getLogs max range
+  refreshMs: 15000,
+};
+const EXPLORER = {
+  5318007: "https://lasna.reactscan.net/tx/",
+  84532: "https://sepolia.basescan.org/tx/",
+  1301: "https://sepolia.uniscan.xyz/tx/",
+  11155111: "https://sepolia.etherscan.io/tx/",
+};
+const CHAIN = { 84532: "Base Sepolia", 1301: "Unichain Sepolia", 11155111: "Ethereum Sepolia", 5318007: "Lasna" };
+const T = { // keccak256 of the event signatures (src/IRhenium.sol, src/demo/PaymentReactives.sol)
+  Sent: "0xe676115bb727d4a7929a2a7fe2bd0b64720b628f8d0f0e341003276e520f3a7f",
+  Confirmed: "0xaf1c79aa97019309a4cbcf74955a4ea3930df8bce0fb744de19fefb0cf9d35bc",
+  FailureSeen: "0xf9c669ec029961f2b71ac3e11cb1c57c8b721523c0c62229a59b4c71012c1fec",
+  TimedOut: "0x7b260188fdcf709667622f634ad0b56b462d0534f0b757077c4fd6eaf5af32bc",
+  GaveUp: "0x2ab213f87226a1de20cb0cc73b13994d9f67a534e7abc81d113c081c126709be",
+  AlarmSent: "0x1d32f3c92fbeb16c73c32a3ad72a6d40589deffd0abca4ce93ee45abfb4afa33",
+  PayoutTracked: "0xfb468925fd8511acd17ab234b069d7ee565f7f06eb4a24aa67fd441313e22920",
+  PayoutRequested: "0xeffa644bae5f60a0e2baa302a470b694c0015a47dde268e28c8d28ae7b5c219f",
+};
+const SEL = { pendingCount: "0xea70b4af", cronSubscribed: "0xc0d062c6" };
+const CRON_TOPICS = {
+  "0x04463f7c1651e6b9774d7f85c85bb94654e3c46ca79b0c16fb16d4183307b687": "Cron10 (~10 s)",
+  "0xb49937fb8970e19fd46d48f7e3fb00d659deac0347f79cd7cb542f0fc1503c70": "Cron100 (~2 min)",
+  "0xe20b31294d84c3661ddc8f423abb9c70310d0cf172aa2714ead78029b325e3f4": "Cron1000 (~17 min)",
+};
+const KNOWN_TOPICS = {
+  "0x8d84aa4c3d0f1410a0ed52701dfd802c9f0ebf00aa65c54a393d180a3f9c0cd3": "Delivered(receiptId, attempt)",
+  "0xc8313f695443128e273f1edfcec40b94b7deea8dfbeafd0043290d6601d999db": "CallbackFailure(recipient, payload)",
+  "0x2cb1c6b0715e637e505f7515e1ee65486495faf98fd6e52e333e302573abeb2d": "PaymentRequested (origin)",
+};
+
+// ---------------------------------------------------------------- JSON-RPC
+let rpcId = 0;
+async function rpc(method, params) {
+  const r = await fetch(CFG.lasnaRpc, { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: ++rpcId, method, params }) });
+  const j = await r.json();
+  if (j.error) throw new Error(method + ": " + (j.error.message || JSON.stringify(j.error)));
+  return j.result;
+}
+async function rpcBatch(calls) {
+  if (!calls.length) return [];
+  const body = calls.map(([m, p], i) => ({ jsonrpc: "2.0", id: i, method: m, params: p }));
+  const r = await fetch(CFG.lasnaRpc, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  const out = [];
+  for (const x of j) { if (x.error) throw new Error(x.error.message || "batch error"); out[x.id] = x.result; }
+  return out;
+}
+const hexn = (h) => Number(BigInt(h));
+const word = (data, i) => "0x" + data.slice(2 + 64 * i, 2 + 64 * (i + 1));
+const addr = (w) => "0x" + w.slice(-40);
+const short = (h) => h.slice(0, 8) + "…" + h.slice(-6);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const txLink = (chain, h, label) => `<a href="${EXPLORER[chain] || "#"}${h}" target="_blank" rel="noopener" class="mono">${esc(label || short(h))}</a>`;
+const usd = (w) => (Number(BigInt(w)) / 1e6).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " mUSD";
+
+// ---------------------------------------------------------------- state
+const logs = []; const seen = new Set(); const blockTs = new Map();
+let scannedTo = CFG.fromBlock - 1;
+
+async function fetchNewLogs() {
+  const head = hexn(await rpc("eth_blockNumber", []));
+  const addrs = [CFG.reactive, CFG.naive].filter(Boolean);
+  const calls = [];
+  for (let a = scannedTo + 1; a <= head; a += CFG.span) {
+    calls.push(["eth_getLogs", [{ address: addrs, fromBlock: "0x" + a.toString(16), toBlock: "0x" + Math.min(a + CFG.span - 1, head).toString(16) }]]);
+  }
+  for (let i = 0; i < calls.length; i += 10) {
+    for (const res of await rpcBatch(calls.slice(i, i + 10))) {
+      for (const l of res) {
+        const k = l.transactionHash + ":" + l.logIndex;
+        if (!seen.has(k)) { seen.add(k); logs.push(l); }
+      }
+    }
+  }
+  scannedTo = head;
+  const need = [...new Set(logs.map((l) => l.blockNumber))].filter((b) => !blockTs.has(b));
+  for (let i = 0; i < need.length; i += 50) {
+    const res = await rpcBatch(need.slice(i, i + 50).map((b) => ["eth_getBlockByNumber", [b, false]]));
+    res.forEach((blk, j) => blockTs.set(need[i + j], hexn(blk.timestamp)));
+  }
+  return head;
+}
+
+function buildReceipts() {
+  const R = new Map(); const pay = new Map();
+  const mine = logs.filter((l) => l.address.toLowerCase() === CFG.reactive)
+    .sort((a, b) => hexn(a.blockNumber) - hexn(b.blockNumber) || hexn(a.logIndex) - hexn(b.logIndex));
+  const get = (id) => { if (!R.has(id)) R.set(id, { id, attempts: [], status: "Pending" }); return R.get(id); };
+  for (const l of mine) {
+    const t0 = l.topics[0], ts = blockTs.get(l.blockNumber);
+    if (t0 === T.PayoutTracked) { pay.set(hexn(l.topics[2]), { paymentId: hexn(l.topics[1]), to: addr(word(l.data, 0)), amount: word(l.data, 1) }); continue; }
+    if (![T.Sent, T.Confirmed, T.FailureSeen, T.TimedOut, T.GaveUp, T.AlarmSent].includes(t0)) continue;
+    const r = get(hexn(l.topics[1]));
+    if (t0 === T.Sent) {
+      r.chainId = hexn(l.topics[2]); r.recipient = addr(l.topics[3]);
+      r.attempts.push({ n: hexn(word(l.data, 0)), gas: hexn(word(l.data, 1)), tx: l.transactionHash, ts, outcome: null });
+      if (r.first === undefined) r.first = ts;
+    } else {
+      const n = hexn(word(l.data, 0));
+      const a = r.attempts.find((x) => x.n === n);
+      if (t0 === T.Confirmed) { r.status = r.attempts.length > 1 ? "Recovered" : "Confirmed"; r.done = ts; if (a) a.outcome = { kind: "ok", dest: word(l.data, 1), tx: l.transactionHash }; }
+      if (t0 === T.FailureSeen && a) a.outcome = { kind: "fail", dest: word(l.data, 1), tx: l.transactionHash };
+      if (t0 === T.TimedOut && a) a.outcome = { kind: "lost", tx: l.transactionHash };
+      if (t0 === T.GaveUp) { r.status = "Failed"; r.done = ts; r.gaveUpTx = l.transactionHash; }
+      if (t0 === T.AlarmSent) r.alarm = { chainId: hexn(l.topics[2] || "0x0"), tx: l.transactionHash };
+    }
+  }
+  for (const [id, p] of pay) if (R.has(id)) R.get(id).payment = p;
+  return [...R.values()].sort((a, b) => b.id - a.id);
+}
+
+function renderReceipts(list) {
+  const c = { Confirmed: 0, Recovered: 0, Pending: 0, Failed: 0 };
+  list.forEach((r) => c[r.status]++);
+  document.getElementById("t-first").textContent = c.Confirmed;
+  document.getElementById("t-recov").textContent = c.Recovered;
+  document.getElementById("t-pend").textContent = c.Pending;
+  document.getElementById("t-fail").textContent = c.Failed;
+  const el = document.getElementById("receipts");
+  if (!list.length) { el.innerHTML = '<div class="empty">No receipts yet.</div>'; return; }
+  el.innerHTML = list.map((r) => {
+    const p = r.payment;
+    const dur = r.done !== undefined && r.first !== undefined ? `${r.done - r.first}s from first send to ${r.status === "Failed" ? "give-up" : "confirmation"}` : "";
+    const atts = r.attempts.map((a) => {
+      let o = '<span class="out-wait">waiting for Delivered…</span>';
+      if (a.outcome?.kind === "ok") o = `<span class="out-ok">Delivered</span> on ${CHAIN[r.chainId] || r.chainId}: ${txLink(r.chainId, a.outcome.dest)} · seen on Lasna ${txLink(5318007, a.outcome.tx)}`;
+      else if (a.outcome?.kind === "fail") o = `<span class="out-fail">CallbackFailure</span> on ${CHAIN[r.chainId] || r.chainId}: ${txLink(r.chainId, a.outcome.dest)} · retried in ${txLink(5318007, a.outcome.tx)}`;
+      else if (a.outcome?.kind === "lost") o = `<span class="out-lost">No event at all</span> (delivery reverted before the method ran) · caught by cron timeout ${txLink(5318007, a.outcome.tx)}`;
+      else if (r.status !== "Pending") o = '<span class="meta">superseded</span>';
+      return `<li><span class="k">attempt ${a.n}</span><span class="mono">${a.gas.toLocaleString()} gas</span><span class="o">sent ${txLink(5318007, a.tx)} → ${o}</span></li>`;
+    }).join("");
+    const head = p ? `payment #${p.paymentId}: ${usd(p.amount)} to <span class="mono">${short(p.to)}</span>` : `to <span class="mono">${short(r.recipient || "")}</span>`;
+    const tail = r.status === "Failed" ? `<div class="meta">Gave up ${txLink(5318007, r.gaveUpTx)}${r.alarm ? ` · alarm sent to ${CHAIN[r.alarm.chainId] || r.alarm.chainId} (payer refund) ${txLink(5318007, r.alarm.tx)}` : ""}</div>` : "";
+    return `<div class="rcpt"><div class="rhead"><span class="rid">Receipt ${r.id}</span><span class="pill ${r.status}">${r.status}</span>
+      <span class="meta">${head}</span><span class="meta">${dur}</span></div><ol class="att">${atts}</ol>${tail}</div>`;
+  }).join("");
+}
+
+function renderNaive() {
+  const body = document.getElementById("naive");
+  if (!CFG.naive) { document.getElementById("naiveSection").hidden = true; return; }
+  const rows = logs.filter((l) => l.address.toLowerCase() === CFG.naive && l.topics[0] === T.PayoutRequested)
+    .sort((a, b) => hexn(b.blockNumber) - hexn(a.blockNumber));
+  body.innerHTML = rows.length ? rows.map((l) => `<tr><td>#${hexn(l.topics[1])}: ${usd(word(l.data, 1))}</td>
+      <td class="mono">${hexn(word(l.data, 2)).toLocaleString()}</td><td>${txLink(5318007, l.transactionHash)}</td>
+      <td><span class="pill Unknown">Unknown</span> <span class="meta">fire-and-forget: no acknowledgement, no retry</span></td></tr>`).join("")
+    : '<tr><td colspan="4" class="empty">No naive payments yet.</td></tr>';
+}
+
+async function renderLive() {
+  const [pend, cron, fr] = await rpcBatch([
+    ["eth_call", [{ to: CFG.reactive, data: SEL.pendingCount }, "latest"]],
+    ["eth_call", [{ to: CFG.reactive, data: SEL.cronSubscribed }, "latest"]],
+    ["rnk_getCommittedSequenceFrontier", []],
+  ]);
+  const cronOn = hexn(cron) === 1;
+  const c = document.getElementById("cron");
+  c.classList.toggle("on", cronOn);
+  c.lastElementChild.textContent = cronOn ? "cron subscribed (receipts pending)" : "cron off (nothing pending, not billed)";
+  const pc = document.getElementById("pendingChip");
+  pc.classList.toggle("on", hexn(pend) === 0);
+  pc.lastElementChild.textContent = `${hexn(pend)} pending on-chain`;
+  if (fr && fr.height) document.getElementById("frontier").textContent = `Lasna committed height ${hexn(fr.height).toLocaleString()}`;
+}
+
+async function loadSubs() {
+  const el = document.getElementById("subs");
+  el.textContent = "Loading rnk_getFilters…";
+  try {
+    const f = await rpc("rnk_getFilters", []);
+    const filters = f.TopicFilters || f.topicFilters || [];
+    const mine = filters.filter((x) => (x.Configs || []).some((c) => c.Contract.toLowerCase() === CFG.reactive && c.Active));
+    if (!mine.length) { el.textContent = "No active subscriptions."; return; }
+    el.className = "scroll";
+    el.innerHTML = `<table><thead><tr><th>Chain</th><th>Contract</th><th>Event (topic0)</th><th>topic1</th></tr></thead><tbody>${mine.map((x) => {
+      const t0 = x.Topics[0]; const name = CRON_TOPICS[t0] || KNOWN_TOPICS[t0] || short(t0 || "");
+      const t1 = x.Topics[1] ? short(x.Topics[1]) : "any";
+      return `<tr><td>${CHAIN[x.ChainId] || x.ChainId}</td><td class="mono">${short(x.Contract || "")}</td><td>${esc(name)}</td><td class="mono">${t1}</td></tr>`;
+    }).join("")}</tbody></table><div class="empty">Filter set version ${f.Version ?? f.version}. Cron appears only while receipts are pending.</div>`;
+  } catch (e) { el.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+
+async function refresh() {
+  try {
+    await fetchNewLogs();
+    renderReceipts(buildReceipts());
+    renderNaive();
+    await renderLive();
+    document.getElementById("updated").textContent = "Updated " + new Date().toLocaleTimeString();
+  } catch (e) {
+    document.getElementById("updated").innerHTML = `<span style="color:var(--bad)">RPC error: ${esc(e.message)} (retrying)</span>`;
+  }
+}
+
+const contractA = document.getElementById("contract");
+contractA.textContent = short(CFG.reactive);
+contractA.href = "https://lasna.reactscan.net/address/" + CFG.reactive;
+document.getElementById("loadSubs").addEventListener("click", loadSubs);
+document.getElementById("theme").addEventListener("click", () => {
+  const r = document.documentElement;
+  const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = dark ? "light" : "dark";
+});
+refresh();
+setInterval(refresh, CFG.refreshMs);
+</script>
+</body>
+</html>
