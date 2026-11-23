@@ -1,8 +1,9 @@
 # Rhenium
 
-**Over 10,252 callbacks requested on Reactive Lasna to Base Sepolia and Unichain Sepolia in 7 days (Nov 14–21, 2026),
-289 (2.8%) emitted `CallbackFailure` on the destination proxy and were still billed, and 31 more never produced a
-destination transaction. None of the 10,252 gave the requesting reactive contract any acknowledgement.**
+**Across all Reactive Lasna traffic to Base Sepolia and Unichain Sepolia in 7 days (Nov 14–21, 2026), from every
+reactive contract on the network, not just Rhenium: of 10,252 callbacks requested, 289 (2.8%) emitted `CallbackFailure`
+on the destination proxy and were still billed, and 31 more never produced a destination transaction. None of the
+10,252 gave the requesting reactive contract any acknowledgement.**
 Example failure: [Base Sepolia `0xcc65ca83…ecdc`](https://sepolia.basescan.org/tx/0xcc65ca83b89de8a8a989d7daf6ff4c8d4f6543712618ad22f7c24121225eecdc).
 Method and raw data: [`research/`](research/) ([how it was measured](#how-the-number-was-measured)).
 
@@ -82,15 +83,17 @@ followed the same path; all their hashes are on the dashboard and in [`research/
 
 | Measured | Median | Clock |
 |---|---|---|
-| Payment requested on Base → Bob paid on Unichain | **32 s** | Base vs Unichain |
-| Failure detected → delivered on Unichain | **5 s** | Lasna vs Unichain |
+| Tracked round trip of a delivery: Lasna request → Unichain `Delivered` → Lasna `ReceiptConfirmed` | **2 s** | Lasna only |
+| Failure detected → retried callback delivered on Unichain | **5 s** | Lasna vs Unichain |
 | Failure detected → receipt Confirmed | 4 s | Lasna only |
-| Successful attempt round trip (Lasna → Unichain → Lasna) | 2 s | Lasna only |
 | Payment requested → failure detected | 27 s | Base vs Lasna |
+| End to end, worst case on purpose: payment requested on Base → Bob paid on Unichain, through two failures | 32 s | Base vs Unichain |
 
-The 27 s is the configured timeout (20 Lasna blocks, checked on Cron10 ticks); it only applies to the silent-revert
-case, which leaves no event to react to. A `CallbackFailure` is reacted to in about 2 s. Lasna's block clock was
-observed 1–3 s ahead of Base and Unichain, so mixed-clock rows carry that skew.
+Every one of these loops was made to fail twice on purpose (start gas 100k): first a silent revert, then a
+`CallbackFailure`. The 27 s is the timeout configured for the silent case (20 Lasna blocks, checked on Cron10 ticks),
+which leaves no event to react to, so it dominates the 32 s; it is a setting, not a protocol limit. A `CallbackFailure`
+is reacted to in about 2 s, and a callback that succeeds first time is confirmed in one ~2 s round trip. Lasna's block
+clock was observed 1–3 s ahead of Base and Unichain, so mixed-clock rows carry that skew.
 Per-loop data: [`research/data/latency.json`](research/data/latency.json), produced by [`research/latency.py`](research/latency.py).
 
 ### Deployed contracts
@@ -211,8 +214,10 @@ docs/spike-report.md         Step 1 spike with tx hashes
 ```
 
 Run it yourself: install [Foundry](https://getfoundry.sh), `git clone --recursive`, `forge test`. To deploy your own
-copy, put a **testnet** key in `.env` (see `script/demo.sh` for the variables), fund it on Lasna, Base Sepolia and
-Unichain Sepolia, then `script/demo.sh deploy` and `script/demo.sh pay rhenium 100000`.
+copy, `cp .env.example .env`, put a **testnet** key in it, fund that address on Lasna, Base Sepolia and Unichain
+Sepolia, then `script/demo.sh deploy` and `script/demo.sh pay rhenium 100000`.
+
+License: [MIT](LICENSE).
 
 ## Limits
 

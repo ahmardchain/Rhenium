@@ -70,7 +70,8 @@ Failed callbacks that reach the method are billed; deliveries that revert inside
 * Unsubscribed from `react()` on the first tick with nothing pending (`Cron(false)`), and resubscribed on the next Ping.
 * **Cost:** reactive balance fell ~0.021-0.026 REACT per Cron10 tick (balance read at blocks 8953311 / 8953320 / 8953331),
   i.e. ~7-9 REACT per hour while anything is pending. Gas-only estimate is ~0.009 REACT per tick; the rest is the network fee.
-  Conclusion: the library defaults to Cron100 and only keeps cron on while receipts are pending.
+  Conclusion: the library keeps cron subscribed only while receipts are pending. The interval is a config choice
+  (`cronTopic`): the live demo uses Cron10 for fast silent-failure detection; Cron100 is ~10x cheaper and ~10x slower.
 
 ## Not done / caveats
 
