@@ -137,7 +137,7 @@ rhenium/=lib/Rhenium/src/
 
 Then `import {RheniumReactive} from "rhenium/RheniumReactive.sol";`.
 
-**Install with npm / Hardhat:**
+**Install with npm / Hardhat** ([`rhenium-contracts` on npm](https://www.npmjs.com/package/rhenium-contracts), published from CI by [`.github/workflows/publish.yml`](.github/workflows/publish.yml)):
 
 ```bash
 npm install rhenium-contracts
@@ -274,6 +274,4 @@ License: [MIT](LICENSE).
   settlement); it is only released on give-up (refund).
 * **Measurement:** Ethereum Sepolia deliveries were not measured (its RPCs were unreachable during Step 0); the Base
   silent-revert scan was not run.
-* **npm package not yet published.** `package.json` for `rhenium-contracts@0.1.0` is ready (`npm pack --dry-run`
-  ships 7 files, about 14.5 kB) but `npm install rhenium-contracts` works only after it is published.
 * **Testnet only.** No mainnet deployment, no audit, no real funds.
