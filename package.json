@@ -1,0 +1,35 @@
+{
+  "name": "rhenium-contracts",
+  "version": "0.1.0",
+  "description": "Delivery receipts and automatic gas-escalating retries for Reactive Network callbacks (Solidity library).",
+  "license": "MIT",
+  "author": "Ahmad Aminu <ahmardchain@gmail.com>",
+  "homepage": "https://rhenium-liard.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmardchain/Rhenium.git"
+  },
+  "bugs": "https://github.com/ahmardchain/Rhenium/issues",
+  "keywords": [
+    "reactive-network",
+    "solidity",
+    "callbacks",
+    "cross-chain",
+    "foundry",
+    "hardhat",
+    "unichain",
+    "base"
+  ],
+  "files": [
+    "src/IRhenium.sol",
+    "src/RheniumCallback.sol",
+    "src/RheniumReactive.sol",
+    "src/examples/Minimal.sol",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "forge test",
+    "build": "forge build"
+  }
+}
