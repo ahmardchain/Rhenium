@@ -7,22 +7,26 @@
 <meta name="description" content="Live, read-only view of Rhenium delivery receipts on Reactive Lasna: every cross-chain callback tracked until it is confirmed on the destination.">
 <style>
   :root {
-    --bg: #f7f7f5; --panel: #ffffff; --ink: #1b1d21; --muted: #5d6470; --line: #e3e4e0;
-    --ok: #13795b; --ok-bg: #e3f4ec; --warn: #9a5b00; --warn-bg: #fdf0db;
-    --bad: #b42318; --bad-bg: #fde8e6; --info: #2f5bd3; --info-bg: #e6ecfc; --idle: #6b7280; --idle-bg: #eef0f2;
+    --bg: #f4f4f4; --panel: #ffffff; --ink: #161616; --muted: #5c5c5c; --line: #dddddd;
+    --ok: #1d6b45; --ok-bg: #e6f0ea; --warn: #3d3d3d; --warn-bg: #ebebeb;
+    --bad: #a51d2d; --bad-bg: #f6e7e9; --info: #24479c; --info-bg: #e9edf6; --idle: #6b6b6b; --idle-bg: #efefef;
+    --code-bg: #f7f7f7;
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --serif: "Iowan Old Style", Charter, "Palatino Linotype", Georgia, serif;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #111316; --panel: #191c20; --ink: #e8e9eb; --muted: #9aa1ab; --line: #2a2e34;
-      --ok: #4cc79a; --ok-bg: #12301f; --warn: #f0b45b; --warn-bg: #33270f;
-      --bad: #ff8a7d; --bad-bg: #3a1714; --info: #8aa8ff; --info-bg: #1a2443; --idle: #9aa1ab; --idle-bg: #23272d;
+      --bg: #101010; --panel: #181818; --ink: #ececec; --muted: #9b9b9b; --line: #2c2c2c;
+      --ok: #6cc49a; --ok-bg: #17251d; --warn: #d4d4d4; --warn-bg: #262626;
+      --bad: #e5484d; --bad-bg: #2a1618; --info: #9db0e0; --info-bg: #23252a; --idle: #9b9b9b; --idle-bg: #222222;
+      --code-bg: #141414;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #111316; --panel: #191c20; --ink: #e8e9eb; --muted: #9aa1ab; --line: #2a2e34;
-    --ok: #4cc79a; --ok-bg: #12301f; --warn: #f0b45b; --warn-bg: #33270f;
-    --bad: #ff8a7d; --bad-bg: #3a1714; --info: #8aa8ff; --info-bg: #1a2443; --idle: #9aa1ab; --idle-bg: #23272d;
+    --bg: #101010; --panel: #181818; --ink: #ececec; --muted: #9b9b9b; --line: #2c2c2c;
+    --ok: #6cc49a; --ok-bg: #17251d; --warn: #d4d4d4; --warn-bg: #262626;
+    --bad: #e5484d; --bad-bg: #2a1618; --info: #9db0e0; --info-bg: #23252a; --idle: #9b9b9b; --idle-bg: #222222;
+    --code-bg: #141414;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -68,8 +72,41 @@
   button:hover { border-color: var(--muted); }
   .err { color: var(--bad); padding: 12px 16px; }
   footer { color: var(--muted); font-size: 13px; margin-top: 28px; }
+  .Pending { border: 1px dashed var(--warn); }
+  /* editorial top section: flat paper and ink */
+  .mast { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px;
+    border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+  .wordmark { font-family: var(--serif); font-size: 34px; font-weight: 600; letter-spacing: -0.02em; margin: 0; line-height: 1; }
+  .chains { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.02em; }
+  .mast nav { display: flex; gap: 16px; font-size: 14px; }
+  .mast nav a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .lede { font-family: var(--serif); font-size: 21px; line-height: 1.35; margin: 14px 0 18px; max-width: 46ch; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  .stat { padding: 12px 16px 12px 0; }
+  .stat + .stat { padding-left: 16px; border-left: 1px solid var(--line); }
+  .stat .v { font-family: var(--serif); font-size: 30px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat .k { font-size: 13px; font-weight: 600; margin-top: 2px; }
+  .stat .s { font-size: 12px; color: var(--muted); }
+  .use { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; margin-bottom: 28px; }
+  .use h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+  .cmd { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--code-bg);
+    border-radius: 6px; padding: 6px 6px 6px 12px; margin-bottom: 8px; }
+  .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  .use p { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+  pre.code { margin: 0; border: 1px solid var(--line); background: var(--code-bg); border-radius: 6px; padding: 12px 14px;
+    overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; color: var(--ink); }
+  pre.code .c { color: var(--muted); }
+  .explorer h2 { font-size: 18px; margin: 0 0 4px; }
+  .explorer p { margin: 0; color: var(--muted); max-width: 70ch; }
   @media (max-width: 720px) {
     .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stat:nth-child(3) { padding-left: 0; border-left: 0; }
+    .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .use { grid-template-columns: minmax(0, 1fr); }
+    .wordmark { font-size: 30px; }
+    .lede { font-size: 19px; }
     ol.att li { grid-template-columns: 70px 1fr; }
     ol.att li .o { grid-column: 1 / -1; padding-left: 70px; }
   }
@@ -77,11 +114,53 @@
 </head>
 <body>
 <main>
-  <header>
-    <h1>Rhenium receipts</h1>
+  <header class="mast">
+    <h1 class="wordmark">Rhenium</h1>
+    <span class="chains">Lasna · Base Sepolia · Unichain Sepolia</span>
+    <nav><a href="https://github.com/ahmardchain/Rhenium" target="_blank" rel="noopener">GitHub</a></nav>
+  </header>
+  <p class="lede">Delivery receipts and automatic gas-escalating retries for Reactive Network callbacks.</p>
+
+  <div class="stats" aria-label="Verified figures">
+    <div class="stat"><div class="v">2.8%</div><div class="k">callbacks failed &amp; billed</div>
+      <div class="s">289 / 10,252 in 7 days · 31 lost · 0 acks</div></div>
+    <div class="stat"><div class="v">2 s</div><div class="k">median tracked round trip</div>
+      <div class="s">Lasna → Unichain → Lasna, 6 live loops</div></div>
+    <div class="stat"><div class="v">5 s</div><div class="k">median failure → retry delivered</div>
+      <div class="s">6 live loops on Unichain Sepolia</div></div>
+    <div class="stat"><div class="v">41</div><div class="k">Foundry tests passing</div>
+      <div class="s">library, demo end-to-end, spike</div></div>
+  </div>
+
+  <div class="use">
+    <div>
+      <h3>Install</h3>
+      <div class="cmd"><code>npm install rhenium-contracts</code><button type="button" class="copy" data-copy="npm install rhenium-contracts">Copy</button></div>
+      <div class="cmd"><code>forge install ahmardchain/Rhenium</code><button type="button" class="copy" data-copy="forge install ahmardchain/Rhenium">Copy</button></div>
+      <p>Also needs <a href="https://github.com/Reactive-Network/reactive-lib-omni" target="_blank" rel="noopener">reactive-lib-omni</a>
+        with the <code>@reactive/</code> remapping (see the README).</p>
+    </div>
+    <div>
+      <h3>Integrate in 10 lines</h3>
+<pre class="code"><span class="c">// Reactive Lasna: instead of AbstractReactive</span>
+contract MyReactive is RheniumReactive {
+    function _react(LogRecord calldata log_) internal override {
+        _sendTracked(1301, myCallback, 200_000, abi.encode(log_.topic1));
+    }
+}
+<span class="c">// Destination chain: instead of AbstractCallback</span>
+contract MyCallback is RheniumCallback {
+    function _onDelivery(uint256 receiptId, bytes calldata data)
+        internal override { <span class="c">/* your action */</span> }
+}</pre>
+    </div>
+  </div>
+
+  <div class="explorer">
+    <h2>Live receipts</h2>
     <p>Every cross-chain callback this reactive contract sends is tracked until the destination acknowledges it. Failed
       or lost callbacks are retried with more gas. Read live from Reactive Lasna; nothing here is cached or mocked.</p>
-  </header>
+  </div>
 
   <div class="bar">
     <span>Contract <a id="contract" class="mono" target="_blank" rel="noopener"></a></span>
@@ -338,6 +417,21 @@ document.getElementById("theme").addEventListener("click", () => {
   const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   r.dataset.theme = dark ? "light" : "dark";
 });
+for (const b of document.querySelectorAll("button.copy")) {
+  b.addEventListener("click", async () => {
+    const text = b.dataset.copy;
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (_) {
+      try {
+        const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", "");
+        t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select();
+        ok = document.execCommand("copy"); t.remove();
+      } catch (_) { ok = false; }
+    }
+    b.textContent = ok ? "Copied" : "Copy failed";
+    setTimeout(() => { b.textContent = "Copy"; }, 1500);
+  });
+}
 refresh();
 setInterval(refresh, CFG.refreshMs);
 </script>

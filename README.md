@@ -94,6 +94,13 @@ Every one of these loops was made to fail twice on purpose (start gas 100k): fir
 which leaves no event to react to, so it dominates the 32 s; it is a setting, not a protocol limit. A `CallbackFailure`
 is reacted to in about 2 s, and a callback that succeeds first time is confirmed in one ~2 s round trip. Lasna's block
 clock was observed 1–3 s ahead of Base and Unichain, so mixed-clock rows carry that skew.
+
+**Why this needs Reactive Omni.** Omni runs on CometBFT with instant finality and blocks of about 1 s, down from roughly
+7 s before Omni ([Reactive docs](https://dev.reactive.network/); we measured 1.06 s per Lasna block), so Rhenium's
+three-hop `detect → retry → confirm` loop completes in about 4–5 s (4 s median above) where the same three hops would
+take 21 s or more at pre-Omni block times (arithmetic estimate, not measured). That puts on-chain callback recovery
+inside the budget of low-latency DeFi loops such as stop-losses, liquidations and cross-chain payments, which is what
+the Every Second Counts track is about.
 Per-loop data: [`research/data/latency.json`](research/data/latency.json), produced by [`research/latency.py`](research/latency.py).
 
 ### Deployed contracts
@@ -114,6 +121,39 @@ naive reactive contract on Lasna and the Rhenium payee on Unichain). They are un
 link txs: [`deployments/demo.env`](deployments/demo.env). Spike contracts: [`docs/spike-report.md`](docs/spike-report.md).
 
 ## Use the library in 10 lines
+
+**Install with Foundry** (the repository must be public for `forge install`):
+
+```bash
+forge install ahmardchain/Rhenium
+forge install Reactive-Network/reactive-lib-omni
+```
+
+```text
+# remappings.txt
+rhenium/=lib/Rhenium/src/
+@reactive/=lib/reactive-lib-omni/
+```
+
+Then `import {RheniumReactive} from "rhenium/RheniumReactive.sol";`.
+
+**Install with npm / Hardhat:**
+
+```bash
+npm install rhenium-contracts
+git submodule add https://github.com/Reactive-Network/reactive-lib-omni lib/reactive-lib-omni
+```
+
+```text
+# remappings.txt
+@reactive/=lib/reactive-lib-omni/
+```
+
+Then `import {RheniumReactive} from "rhenium-contracts/src/RheniumReactive.sol";`. `reactive-lib-omni` is a required
+peer dependency, but it is not an npm package (it has no `package.json`, so `npm install github:…` fails), so fetch it with
+git as above. Hardhat 3 reads `remappings.txt` natively; on Hardhat 2 add `@nomicfoundation/hardhat-foundry`.
+The npm package contains only the library (`src/IRhenium.sol`, `src/RheniumCallback.sol`, `src/RheniumReactive.sol`,
+`src/examples/Minimal.sol`) plus this README and the license.
 
 ```solidity
 // Reactive Lasna: inherit RheniumReactive instead of AbstractReactive
@@ -234,4 +274,6 @@ License: [MIT](LICENSE).
   settlement); it is only released on give-up (refund).
 * **Measurement:** Ethereum Sepolia deliveries were not measured (its RPCs were unreachable during Step 0); the Base
   silent-revert scan was not run.
+* **npm package not yet published.** `package.json` for `rhenium-contracts@0.1.0` is ready (`npm pack --dry-run`
+  ships 7 files, about 14.5 kB) but `npm install rhenium-contracts` works only after it is published.
 * **Testnet only.** No mainnet deployment, no audit, no real funds.
