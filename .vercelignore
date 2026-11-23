@@ -1,0 +1,9 @@
+lib/
+research/
+test/
+src/
+script/
+docs/
+deployments/
+out/
+cache/

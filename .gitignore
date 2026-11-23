@@ -1,0 +1,15 @@
+# Foundry
+out/
+cache/
+broadcast/*/31337/
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+keys/
+# Python
+__pycache__/
+*.pyc
+node_modules/
+# in-progress scan logs (final results are the committed .json files)
+research/data/reverted_*.log
